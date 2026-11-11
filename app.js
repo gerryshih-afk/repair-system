@@ -7,6 +7,8 @@
   const formMessage = document.querySelector('#form-message');
   const listMessage = document.querySelector('#list-message');
   const list = document.querySelector('#repair-list');
+  const filterButtons = [...document.querySelectorAll('.urgency-filters button')];
+  const filterSummary = document.querySelector('#filter-summary');
   const categories = ['設備', '網路', '環境', '其他'];
   const urgencies = ['低', '中', '高'];
   const dateFormatter = new Intl.DateTimeFormat('zh-TW', {
@@ -14,6 +16,9 @@
   });
   let client;
   let submitting = false;
+  let loadedRecords = [];
+  let selectedUrgency = '全部';
+  let hasLoadedRecords = false;
 
   // 中斷無回應的請求，讓手機網路不穩時仍能重試。
   async function fetchWithTimeout(input, options = {}) {
@@ -43,10 +48,17 @@
     return element;
   }
 
-  function renderRecords(records) {
+  function renderRecords() {
+    const records = selectedUrgency === '全部'
+      ? loadedRecords
+      : loadedRecords.filter((record) => record.urgency === selectedUrgency);
+    filterSummary.textContent = `緊急程度：${selectedUrgency}，顯示 ${records.length} 筆（最近 ${loadedRecords.length} 筆中）。`;
     list.replaceChildren();
     if (!records.length) {
-      list.append(createTextElement('p', 'empty-state', '目前還沒有報修紀錄，從第一筆登記開始。'));
+      const message = loadedRecords.length
+        ? `最近 ${loadedRecords.length} 筆中沒有緊急程度為「${selectedUrgency}」的報修。`
+        : '目前還沒有報修紀錄，從第一筆登記開始。';
+      list.append(createTextElement('p', 'empty-state', message));
       return;
     }
     records.forEach((record) => {
@@ -68,6 +80,17 @@
     });
   }
 
+  filterButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedUrgency = button.dataset.urgency;
+      filterButtons.forEach((filter) => {
+        filter.setAttribute('aria-pressed', String(filter === button));
+      });
+      // 只篩選最近一次載入的清單，不發出新的 Supabase 請求。
+      if (hasLoadedRecords) renderRecords();
+    });
+  });
+
   async function loadRecords() {
     refreshButton.disabled = true;
     list.setAttribute('aria-busy', 'true');
@@ -77,7 +100,9 @@
         .select('id, created_at, reporter_name, location, category, description, urgency, status')
         .order('created_at', { ascending: false }).limit(20);
       if (error) throw error;
-      renderRecords(data ?? []);
+      loadedRecords = data ?? [];
+      hasLoadedRecords = true;
+      renderRecords();
       showMessage(listMessage, '');
     } catch (error) {
       showMessage(listMessage, `無法載入清單：${error.message || '請檢查網路連線'}。可按「重新整理」重試。`, 'error');

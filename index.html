@@ -31,6 +31,13 @@
     </section>
     <section class="records-section" aria-labelledby="records-heading">
       <div class="section-heading"><div><p class="step">02 / 追蹤紀錄</p><h2 id="records-heading">最近報修</h2><p class="section-description">最近 20 筆紀錄，依登記時間由新到舊排列。</p></div><button id="refresh-button" class="secondary" type="button">重新整理</button></div>
+      <div class="urgency-filters" role="group" aria-label="依緊急程度篩選最近 20 筆報修">
+        <button type="button" data-urgency="全部" aria-pressed="true" aria-controls="repair-list">全部</button>
+        <button type="button" data-urgency="高" aria-pressed="false" aria-controls="repair-list">高</button>
+        <button type="button" data-urgency="中" aria-pressed="false" aria-controls="repair-list">中</button>
+        <button type="button" data-urgency="低" aria-pressed="false" aria-controls="repair-list">低</button>
+      </div>
+      <p id="filter-summary" class="section-description" role="status" aria-live="polite" aria-atomic="true"></p>
       <p id="list-message" class="message" role="status" aria-live="polite" aria-atomic="true"></p>
       <div id="repair-list" class="repair-list" aria-busy="true"></div>
     </section>
