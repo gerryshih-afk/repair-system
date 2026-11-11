@@ -15,7 +15,7 @@ const assert = require('node:assert/strict');
     let failInsert = false;
     let failRead = false;
     let stallRead = false;
-    await page.route('https://cdn.jsdelivr.net/**', async (route) => {
+    await page.route('**/vendor/supabase.js', async (route) => {
       // CDN 真實套件預先以 curl 下載，仍測試 supabase-js v2 的實際 HTTP 行為。
       await route.fulfill({ path: process.env.SUPABASE_BUNDLE || '/tmp/repair-supabase.js', contentType: 'application/javascript' });
     });
@@ -95,13 +95,13 @@ const assert = require('node:assert/strict');
     await page.locator('#refresh-button').click();
     await page.waitForFunction(() => !document.querySelector('#refresh-button').disabled);
     assert.equal(await page.locator('#list-message').innerText(), '');
-    // CDN 未載入時須提供明確訊息且停用送出。
+    // 程式庫未載入時須提供明確訊息且停用送出。
     const offline = await browser.newPage();
-    await offline.route('https://cdn.jsdelivr.net/**', (route) => route.abort());
+    await offline.route('**/vendor/supabase.js', (route) => route.abort());
     await offline.goto('http://127.0.0.1:8000');
     await offline.locator('#form-message.error').waitFor();
     assert.equal(await offline.locator('#submit-button').isDisabled(), true);
-    console.log('PASS: 必填、空白、預設值、省略 status、送出鎖定、成功重載、錯誤保留、清單重試、逾時復原、空清單、文字安全、手機版面與 CDN 失敗。');
+    console.log('PASS: 必填、空白、預設值、省略 status、送出鎖定、成功重載、錯誤保留、清單重試、逾時復原、空清單、文字安全、手機版面與 程式庫失敗。');
   } finally {
     await browser.close();
   }

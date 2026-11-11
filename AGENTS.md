@@ -34,3 +34,5 @@
 使用純 HTML/CSS/JavaScript 及 CDN supabase-js v2，無建置步驟。
 `tests/frontend.cjs` 為 Playwright 模擬 REST 測試；`docs/` 保存介面截圖。
 本機啟動與驗證方式見 README。資料庫結構與政策仍位於 `supabase/schema.sql`。
+
+PWA：`manifest.webmanifest`、`pwa.js`、`sw.js`、`icons/`；離線資源包括本機 `vendor/supabase.js`，授權見同目錄 LICENSE。前端更新請同步遞增 Service Worker 版本。`tests/pwa.cjs` 驗證子路徑、離線與更新流程。
