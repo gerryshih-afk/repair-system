@@ -27,3 +27,10 @@
 ## 安全與範圍
 
 所有示範交付物均應使用虛構姓名與地點。Supabase 必須啟用資料列安全性（RLS）：目前示範允許任何人新增及讀取，但禁止修改與刪除。不得公開具有高權限的服務金鑰。登入驗證、狀態更新權限及通知方式尚未決定；擴大存取權限或實作相關流程前，請先確認需求。
+
+## 前端實作（2026-11）
+
+前端依本次需求放於儲存庫根目錄：`index.html`、`style.css`、`app.js`、`config.js`。
+使用純 HTML/CSS/JavaScript 及 CDN supabase-js v2，無建置步驟。
+`tests/frontend.cjs` 為 Playwright 模擬 REST 測試；`docs/` 保存介面截圖。
+本機啟動與驗證方式見 README。資料庫結構與政策仍位於 `supabase/schema.sql`。
