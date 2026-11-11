@@ -15,6 +15,22 @@
   let client;
   let submitting = false;
 
+  // 中斷無回應的請求，讓手機網路不穩時仍能重試。
+  async function fetchWithTimeout(input, options = {}) {
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    const signal = options.signal;
+    if (signal?.aborted) abort();
+    else signal?.addEventListener('abort', abort, { once: true });
+    const timer = setTimeout(abort, 20000);
+    try {
+      return await fetch(input, { ...options, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', abort);
+    }
+  }
+
   function showMessage(element, text, type = '') {
     element.textContent = text;
     element.className = `message ${type}`.trim();
@@ -114,6 +130,7 @@
     }
     client = window.supabase.createClient(config.supabaseUrl, config.supabasePublishableKey, {
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      global: { fetch: fetchWithTimeout },
     });
     refreshButton.addEventListener('click', loadRecords);
     loadRecords();
