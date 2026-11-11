@@ -92,6 +92,11 @@
   });
 
   async function loadRecords() {
+    if (!navigator.onLine) {
+      list.setAttribute('aria-busy', 'false');
+      showMessage(listMessage, '目前離線，無法讀取最新紀錄。連線後請按「重新整理」。', 'error');
+      return;
+    }
     refreshButton.disabled = true;
     list.setAttribute('aria-busy', 'true');
     showMessage(listMessage, '正在載入報修紀錄…');
@@ -115,6 +120,10 @@
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (submitting || !client || !form.reportValidity()) return;
+    if (!navigator.onLine) {
+      showMessage(formMessage, '目前離線，報修尚未送出。請保持此頁開啟，連線後再送出；重新載入會清除輸入。', 'error');
+      return;
+    }
     const fields = new FormData(form);
     const payload = Object.fromEntries(['reporter_name', 'location', 'category', 'description', 'urgency']
       .map((name) => [name, String(fields.get(name) ?? '').trim()]));
