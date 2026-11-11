@@ -9,6 +9,7 @@
 `app.js` 處理表單及最近 20 筆紀錄，`config.js` 儲存 Supabase URL 與公開 publishable key。
 透過 CDN 載入 supabase-js v2，無須建置。新增僅傳送報修人、地點、類別、問題說明及緊急程度，
 `id`、`created_at` 與 `status` 使用資料庫預設值。時間以台灣時間顯示。
+連線請求超過 20 秒會中斷並顯示錯誤，避免持續停留在載入或送出狀態。
 
 ### 本機預覽
 
@@ -51,6 +52,6 @@ node tests/frontend.cjs
 Chromium 預設路徑為 `/usr/bin/chromium`，可用 `CHROMIUM_PATH` 指定其他路徑。
 CDN 套件路徑可用 `SUPABASE_BUNDLE` 指定。
 測試涵蓋必填與空白驗證、送出 payload、成功與失敗、保留輸入、重試、空清單、文字安全、
-手機寬度及 CDN 載入失敗；示範截圖位於 `docs/mobile.png`、`docs/desktop.png`。
+手機寬度、連線逾時後重試及 CDN 載入失敗；示範截圖位於 `docs/mobile.png`、`docs/desktop.png`。
 真實環境仍需在部署後送出一筆虛構報修，確認資料庫預設時間、狀態與 RLS；
 自動測試的模擬回應不能證明真實資料庫的權限設定。
