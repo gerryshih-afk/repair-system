@@ -3,7 +3,7 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 
-const BASE = process.env.BASE_URL || 'http://127.0.0.1:8000/climate/';
+const BASE = process.env.BASE_URL || 'http://127.0.0.1:8000/';
 const SHOTS = process.env.SCREENSHOT_DIR;
 
 function fakeForecast(lat) {
@@ -92,6 +92,12 @@ function fakeForecast(lat) {
     // 手機寬度不應出現水平捲動
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     assert.equal(overflow, false, '手機版不應水平捲動');
+
+    // 舊網址 /climate/ 應轉址到首頁並保留分頁
+    await page.goto(`${BASE}climate/#dalian`);
+    await page.waitForURL((u) => !u.pathname.includes('/climate'));
+    await page.locator('#h-intro').waitFor();
+    assert.match(await page.locator('#h-intro').innerText(), /大連/);
 
     assert.deepEqual(errors, []);
     console.log('氣候報告頁測試通過');

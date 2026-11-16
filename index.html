@@ -3,46 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#155e52">
-  <title>報修登記｜服務中心</title>
-  <link rel="stylesheet" href="./style.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script defer src="./config.js"></script>
-  <script defer src="./app.js"></script>
+  <title>滬連氣候報告</title>
+  <meta name="description" content="上海與大連的氣候平年值、季節特徵與即時天氣報告。">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header"><div class="header-inner"><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">＋</span> 服務中心</a><span class="header-note">報修與問題登記</span></div></header>
-  <main>
-    <section class="intro"><p class="eyebrow">REPAIR REQUEST</p><h1>讓問題有個著落。</h1><p>登記需要協助的事項，讓每一筆報修都有紀錄。</p></section>
-    <section class="panel" aria-labelledby="form-heading">
-      <div class="section-heading"><div><p class="step">01 / 新增需求</p><h2 id="form-heading">報修登記</h2></div><span class="required-note">所有欄位皆為必填</span></div>
-      <p class="privacy-note">此為公開示範清單，請使用虛構姓名與地點，勿填寫個資或機密資訊。</p>
-      <form id="repair-form">
-        <div class="form-grid">
-          <label for="reporter-name">報修人<input id="reporter-name" name="reporter_name" placeholder="例如：測試同事" required maxlength="100" autocomplete="off"></label>
-          <label for="location">地點或部門<input id="location" name="location" placeholder="例如：示範辦公室 2 樓" required maxlength="200" autocomplete="off"></label>
-          <label for="category">類別<select id="category" name="category" required><option value="" disabled selected>請選擇問題類別</option><option>設備</option><option>網路</option><option>環境</option><option>其他</option></select></label>
-          <label for="urgency">緊急程度<select id="urgency" name="urgency" required><option>低</option><option selected>中</option><option>高</option></select></label>
-          <label class="full-width" for="description">問題說明<textarea id="description" name="description" rows="5" placeholder="請說明發生的情況、時間，以及需要協助的事項。" required maxlength="5000"></textarea></label>
-        </div>
-        <div class="form-footer"><p>送出後將自動記錄登記時間。</p><button id="submit-button" type="submit">送出報修 <span aria-hidden="true">↗</span></button></div>
-        <p id="form-message" class="message" role="status" aria-live="polite" aria-atomic="true"></p>
-      </form>
-    </section>
-    <section class="records-section" aria-labelledby="records-heading">
-      <div class="section-heading"><div><p class="step">02 / 追蹤紀錄</p><h2 id="records-heading">最近報修</h2><p class="section-description">最近 20 筆紀錄，依登記時間由新到舊排列。</p></div><button id="refresh-button" class="secondary" type="button">重新整理</button></div>
-      <div class="urgency-filters" role="group" aria-label="依緊急程度篩選最近 20 筆報修">
-        <button type="button" data-urgency="全部" aria-pressed="true" aria-controls="repair-list">全部</button>
-        <button type="button" data-urgency="高" aria-pressed="false" aria-controls="repair-list">高</button>
-        <button type="button" data-urgency="中" aria-pressed="false" aria-controls="repair-list">中</button>
-        <button type="button" data-urgency="低" aria-pressed="false" aria-controls="repair-list">低</button>
-      </div>
-      <p id="filter-summary" class="section-description" role="status" aria-live="polite" aria-atomic="true"></p>
-      <p id="list-message" class="message" role="status" aria-live="polite" aria-atomic="true"></p>
-      <div id="repair-list" class="repair-list" aria-busy="true"></div>
-    </section>
-    <noscript><p class="message error">請開啟 JavaScript，才能送出與查看報修紀錄。</p></noscript>
-  </main>
-  <footer class="site-footer">報修登記系統 · 每一筆需求，都值得被看見。</footer>
+  <header class="site-header">
+    <div class="wrap">
+      <p class="eyebrow">氣候報告</p>
+      <h1>上海・大連氣候報告</h1>
+      <p class="lede">兩座濱海城市的月均溫、降水量、季節特徵與即時天氣。</p>
+      <nav class="tabs" role="tablist" aria-label="選擇城市">
+        <button type="button" role="tab" id="tab-shanghai" data-view="shanghai" aria-selected="true">上海</button>
+        <button type="button" role="tab" id="tab-dalian" data-view="dalian" aria-selected="false">大連</button>
+        <button type="button" role="tab" id="tab-compare" data-view="compare" aria-selected="false">雙城對照</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="main" role="tabpanel" aria-live="polite"></main>
+
+  <footer class="wrap site-footer">
+    <p>氣候平年值為約 1991–2020 年的參考近似值，整理自中國氣象局公開統計。
+      即時天氣與預報來自 <a href="https://open-meteo.com/" rel="noopener" target="_blank">Open-Meteo</a>，時間以當地時間（UTC+8）顯示。</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

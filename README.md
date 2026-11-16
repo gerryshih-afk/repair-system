@@ -1,92 +1,47 @@
-# 報修登記系統
-用於新增報修需求並查看問題清單的小型示範系統。
-雲端任務測試
-[報修欄位表（Excel）](文件/報修欄位表.xlsx)
+# 上海・大連氣候報告
 
-## 報修網頁
+以繁體中文呈現上海與大連的氣候平年值、季節特徵、即時天氣與 7 日預報。
+純 HTML/CSS/JavaScript，不需建置，直接由 GitHub Pages 提供。
 
-根目錄的 `index.html` 是 GitHub Pages 首頁；`style.css` 負責手機與桌面版面，
-`app.js` 處理表單及最近 20 筆紀錄，`config.js` 儲存 Supabase URL 與公開 publishable key。
-透過 CDN 載入 supabase-js v2，無須建置。新增僅傳送報修人、地點、類別、問題說明及緊急程度，
-`id`、`created_at` 與 `status` 使用資料庫預設值。時間以台灣時間顯示。
-連線請求超過 20 秒會中斷並顯示錯誤，避免持續停留在載入或送出狀態。
+網址：https://gerryshih-afk.github.io/repair-system/
+（舊網址 `/climate/` 會自動轉到首頁。）
 
-### 緊急程度篩選
+## 檔案
 
-最近報修清單上方提供「全部／高／中／低」按鈕，預設選取「全部」。
-目前選取的按鈕以深綠底白字顯示，並以 `aria-pressed` 提供輔助技術辨識。
-篩選只使用網頁已載入的最近 20 筆，不會額外查詢 Supabase，也不代表搜尋全部歷史紀錄。
-清單仍維持由新到舊排列；重新整理清單或送出報修後會保留目前篩選。
-沒有符合的紀錄時顯示提示；緊急程度「高」的標籤使用紅字與淡紅底。
-本次只修改前端及說明文件，未新增資料欄位、未變更資料庫或 `supabase/` 資料夾。
+- `index.html`、`style.css`：頁面與版面，支援手機、桌面與深色模式。
+- `data.js`：上海（徐家匯站）與大連的氣候平年值（約 1991–2020），包括月平均、最高、最低氣溫、
+  月降水量及四季說明。數值為參考近似值，尚未與官方資料逐項核對。
+- `app.js`：分頁「上海／大連／雙城對照」（可用 `#shanghai`、`#dalian`、`#compare` 直接連結），
+  顯示重點數據、內嵌 SVG 氣溫與降水圖、四季特徵、月別表格，並標示當地時間的本月。
+- 即時天氣與 7 日預報來自 Open-Meteo（免金鑰），15 秒逾時；失敗時顯示錯誤與「重新載入」按鈕，
+  平年值仍正常顯示。
+- `climate/index.html`：舊網址轉址頁。
 
-手機確認方式：在此分支的本機預覽向下滑到「最近報修」，確認預設「全部」；
-依序點選「高／中／低」檢查選取樣式及顯示資料，點「全部」恢復原清單。
-有高緊急紀錄時確認其標籤為紅色，沒有符合資料時則確認提示文字。
-合併此變更並完成 Pages 部署後，手機也可從正式網址確認；PR 未合併時仍顯示 main 的版本。
-
-### 本機預覽
+## 本機預覽
 
 ```sh
 python3 -m http.server 8000
 ```
 
-開啟 http://localhost:8000。需要網路連線才能載入 CDN 與存取 Supabase。
+開啟 http://localhost:8000/ 。
 
-### GitHub Pages
+## 測試
 
-在儲存庫 Settings → Pages，選擇 **Deploy from a branch**，來源為 **main / (root)**。
-部署完成後網址為 https://gerryshih-afk.github.io/repair-system/ 。
-不需要額外打包或填入 secret 金鑰。
-
-### 資料庫與公開存取
-
-資料表及政策定義見 `supabase/schema.sql`。本次前端變更不會自動執行 SQL 或修改政策。
-資料庫須允許匿名 SELECT，以及五個表單欄位的 INSERT，且 `status` 預設為「待處理」。
-目前清單公開可讀，請使用虛構姓名與地點。前端公開金鑰不是存取控制，權限由 RLS 與 GRANT 決定。
-
-### 驗證
-
-JavaScript 語法檢查：
+`tests/climate.cjs` 使用 Playwright 與 Chromium，模擬 Open-Meteo 回應，不需外部網路。先啟動上述 HTTP server，再執行：
 
 ```sh
 node --check app.js
-node --check config.js
-```
-
-`tests/frontend.cjs` 使用 Playwright 與 Chromium，模擬 Supabase REST 回應，不寫入真實資料。
-在已有 Playwright 的環境中，先啟動上述 HTTP server，再執行：
-
-```sh
-curl -fsS 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js' -o /tmp/repair-supabase.js
-node tests/frontend.cjs
-```
-
-若本機未安裝 Playwright，可先執行 `npm install --no-save --package-lock=false playwright`；
-Chromium 預設路徑為 `/usr/bin/chromium`，可用 `CHROMIUM_PATH` 指定其他路徑。
-CDN 套件路徑可用 `SUPABASE_BUNDLE` 指定。
-測試涵蓋必填與空白驗證、送出 payload、成功與失敗、保留輸入、重試、空清單、文字安全、
-手機寬度、連線逾時後重試及 CDN 載入失敗；示範截圖位於 `docs/mobile.png`、`docs/desktop.png`。
-真實環境仍需在部署後送出一筆虛構報修，確認資料庫預設時間、狀態與 RLS；
-自動測試的模擬回應不能證明真實資料庫的權限設定。
-
-## 上海・大連氣候報告
-
-`climate/` 是獨立的氣候報告頁（繁體中文），與報修系統互不相依，同樣是純 HTML/CSS/JavaScript，不需建置。
-部署後網址為 https://gerryshih-afk.github.io/repair-system/climate/ 。
-
-- `climate/data.js`：上海（徐家匯站）與大連的氣候平年值（約 1991–2020），包括月平均、最高、最低氣溫與月降水量，以及四季說明。數值為參考近似值。
-- `climate/app.js`：分頁「上海／大連／雙城對照」（可用 `#shanghai`、`#dalian`、`#compare` 直接連結），
-  顯示重點數據、內嵌 SVG 氣溫與降水圖、四季特徵、月別表格，並標示當地時間的本月。
-- 即時天氣與 7 日預報來自 Open-Meteo（免金鑰），15 秒逾時；載入失敗時顯示錯誤與「重新載入」按鈕，平年值仍正常顯示。
-
-本機預覽：在儲存庫根目錄執行 `python3 -m http.server 8000`，開啟 http://localhost:8000/climate/ 。
-
-測試（模擬 Open-Meteo，不需外部網路）：
-
-```sh
-node --check climate/app.js
 node tests/climate.cjs
 ```
 
-設定 `SCREENSHOT_DIR=docs` 會更新 `docs/climate-mobile.png` 與 `docs/climate-desktop.png`。
+可用 `CHROMIUM_PATH` 指定 Chromium 路徑；設定 `SCREENSHOT_DIR=docs` 會更新
+`docs/climate-mobile.png` 與 `docs/climate-desktop.png`。
+
+## GitHub Pages
+
+儲存庫 Settings → Pages 選擇 **Deploy from a branch**，來源為 **main / (root)**。
+
+## 舊報修練習
+
+報修登記系統為練習用途，已自網站移除，不再維護。前端程式可從提交 `48c6abc` 取回。
+儲存庫仍保留 `報修需求筆記.txt`、`文件/報修欄位表.xlsx` 與 `supabase/schema.sql` 作為參考，未在網站上使用。
