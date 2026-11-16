@@ -34,3 +34,8 @@
 使用純 HTML/CSS/JavaScript 及 CDN supabase-js v2，無建置步驟。
 `tests/frontend.cjs` 為 Playwright 模擬 REST 測試；`docs/` 保存介面截圖。
 本機啟動與驗證方式見 README。資料庫結構與政策仍位於 `supabase/schema.sql`。
+
+## 氣候報告頁（2026-11）
+
+`climate/`：上海與大連氣候報告（`index.html`、`style.css`、`app.js`、`data.js`），純前端、無建置，
+即時天氣使用 Open-Meteo。測試為 `tests/climate.cjs`，截圖為 `docs/climate-*.png`。說明見 README。

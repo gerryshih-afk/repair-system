@@ -69,3 +69,24 @@ CDN 套件路徑可用 `SUPABASE_BUNDLE` 指定。
 手機寬度、連線逾時後重試及 CDN 載入失敗；示範截圖位於 `docs/mobile.png`、`docs/desktop.png`。
 真實環境仍需在部署後送出一筆虛構報修，確認資料庫預設時間、狀態與 RLS；
 自動測試的模擬回應不能證明真實資料庫的權限設定。
+
+## 上海・大連氣候報告
+
+`climate/` 是獨立的氣候報告頁（繁體中文），與報修系統互不相依，同樣是純 HTML/CSS/JavaScript，不需建置。
+部署後網址為 https://gerryshih-afk.github.io/repair-system/climate/ 。
+
+- `climate/data.js`：上海（徐家匯站）與大連的氣候平年值（約 1991–2020），包括月平均、最高、最低氣溫與月降水量，以及四季說明。數值為參考近似值。
+- `climate/app.js`：分頁「上海／大連／雙城對照」（可用 `#shanghai`、`#dalian`、`#compare` 直接連結），
+  顯示重點數據、內嵌 SVG 氣溫與降水圖、四季特徵、月別表格，並標示當地時間的本月。
+- 即時天氣與 7 日預報來自 Open-Meteo（免金鑰），15 秒逾時；載入失敗時顯示錯誤與「重新載入」按鈕，平年值仍正常顯示。
+
+本機預覽：在儲存庫根目錄執行 `python3 -m http.server 8000`，開啟 http://localhost:8000/climate/ 。
+
+測試（模擬 Open-Meteo，不需外部網路）：
+
+```sh
+node --check climate/app.js
+node tests/climate.cjs
+```
+
+設定 `SCREENSHOT_DIR=docs` 會更新 `docs/climate-mobile.png` 與 `docs/climate-desktop.png`。
